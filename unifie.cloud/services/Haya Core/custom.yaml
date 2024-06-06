@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: Hayacore
+  namespace: dp-1-389
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: Hayacore
+  template:
+    metadata:
+      labels:
+        app: Hayacore
+    spec:
+      imagePullSecrets:
+        - name: aws-ecr-key
+      containers:
+        - name: Hayacore
+          image: 165007231394.dkr.ecr.us-east-2.amazonaws.com/haya-core:24
+          resources:
+            requests:
+              ephemeral-storage: 200Mi
+              memory: 1000Mi
+              cpu: 50m
+            limits:
+              ephemeral-storage: 4Gi
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: QDRANT_HOST
+              value: 
+            - name: QDRANT_PORT
+              value: '80'
+ 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: Hayacore
+  name: Hayacore
+  namespace: dp-1-389
+spec:
+  ports:
+    - name: Hayacore
+      port: 80
+      targetPort: 8000
+  selector:
+    app: Hayacore
